@@ -2,188 +2,81 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hội Lưu Ly - Quản Lý Hoa</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        body { background: linear-gradient(180deg, #bfe3f7 0%, #eef7fc 100%); min-height: 100vh; }
-        .tier-red { border: 3px solid #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
-        .tier-orange { border: 3px solid #f97316; box-shadow: 0 0 8px rgba(249, 115, 22, 0.4); }
-        .tier-purple { border: 3px solid #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.4); }
-        .tier-blue { border: 3px solid #3b82f6; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
-        
-        /* CSS cố định cho ô input Admin luôn nhìn thấy chữ */
-        .admin-input { background-color: #ffffff !important; color: #000000 !important; border: 1px solid #9ca3af !important; }
+        .tier-red { border: 3px solid #ef4444; }
+        .tier-orange { border: 3px solid #f97316; }
+        .tier-purple { border: 3px solid #a855f7; }
+        .tier-blue { border: 3px solid #3b82f6; }
     </style>
 </head>
-<body class="font-sans text-gray-800 p-4">
+<body class="bg-sky-50 p-4 font-sans">
+    <div class="max-w-xl mx-auto">
+        <h1 class="text-3xl font-black text-center text-blue-900 mb-6">🌸 HỘI LƯU LY 🌸</h1>
 
-    <div class="text-center my-6">
-        <h1 class="text-3xl font-black text-blue-900 tracking-wide">🌸 HỘI LƯU LY 🌸</h1>
-        <div class="flex justify-center gap-6 mt-4 bg-white/70 backdrop-blur-md rounded-2xl p-4 max-w-lg mx-auto shadow-sm text-center">
-            <div><p class="text-[11px] text-gray-500 uppercase font-black">🌸 Tổng Hoa</p><p class="text-2xl font-black text-blue-950" id="total-flowers">0</p></div>
-            <div class="border-l border-gray-300"></div>
-            <div><p class="text-[11px] text-gray-500 uppercase font-black">👥 Hội viên</p><p class="text-2xl font-black text-blue-950" id="total-members">0</p></div>
-            <div class="border-l border-gray-300"></div>
-            <div><p class="text-[11px] text-gray-500 uppercase font-black">📦 Loài kho</p><p class="text-2xl font-black text-blue-950" id="total-flower-types">0</p></div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm mb-6 border border-blue-100">
+            <label class="text-xs font-black text-blue-600 block mb-2">🔍 TÌM KIẾM BỘ SƯU TẬP HỘI VIÊN:</label>
+            <div class="flex gap-2">
+                <input type="text" id="search-name" placeholder="Nhập tên..." class="w-full p-2 border rounded-xl">
+                <button onclick="xemBoSuuTapKhac()" class="bg-green-600 text-white px-6 py-2 rounded-xl font-bold">Xem</button>
+            </div>
         </div>
-    </div>
 
-    <div class="max-w-xl mx-auto bg-white p-5 rounded-2xl shadow-md mb-6 border border-blue-100">
-        <label class="block text-xs font-black text-blue-600 mb-2">👤 NHẬP TÊN HỘI VIÊN:</label>
-        <div class="flex gap-2">
-            <input type="text" id="username" placeholder="Ví dụ: Ngot..." class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-black">
-            <button onclick="taiBoSuuTapThanhVien()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs cursor-pointer">🔍 Xem</button>
+        <div class="bg-white p-4 rounded-2xl shadow-sm mb-6">
+            <input type="text" id="username" placeholder="Tên của bạn để lưu..." class="w-full p-2 border rounded-xl mb-2">
+            <button onclick="luuBoSuuTap()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">💾 Lưu Bộ Sưu Tập Của Tôi</button>
         </div>
-        <div id="view-status" class="text-xs text-amber-950 bg-amber-50 p-4 rounded-xl border border-amber-200 mt-3 hidden"></div>
-        <div class="flex flex-wrap gap-2 text-xs mt-4">
-            <button onclick="locPhamCap('tat-ca')" class="bg-gray-100 px-3 py-1.5 rounded-full font-medium cursor-pointer">🌈 Tất cả</button>
-            <button onclick="locPhamCap('red')" class="bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🔴 Đỏ</button>
-            <button onclick="locPhamCap('orange')" class="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🟠 Cam</button>
-            <button onclick="locPhamCap('purple')" class="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🟣 Tím</button>
-            <button onclick="locPhamCap('blue')" class="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🔵 Lam</button>
-        </div>
-    </div>
 
-    <div class="max-w-xl mx-auto grid grid-cols-3 gap-3" id="flower-grid"></div>
-
-    <div class="max-w-xl mx-auto my-6 text-center">
-        <button onclick="luuBoSuuTapThanhVien()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-xl shadow-md w-full max-w-xs cursor-pointer text-sm">💾 Lưu Bộ Sưu Tập</button>
-    </div>
-
-    <div class="max-w-xl mx-auto bg-slate-900 text-white p-5 rounded-2xl mb-12">
-        <h2 class="text-xs font-black mb-4 text-purple-300">🛠️ ADMIN: THÊM LOÀI HOA MỚI</h2>
-        <div class="grid grid-cols-1 gap-3 text-sm">
-            <input type="text" id="new-flower-name" placeholder="Tên hoa..." class="admin-input w-full rounded-xl px-3 py-2">
-            <select id="new-flower-tier" class="admin-input w-full rounded-xl px-3 py-2">
-                <option value="red">🔴 Phẩm cấp Đỏ</option>
-                <option value="orange">🟠 Phẩm cấp Cam</option>
-                <option value="purple">🟣 Phẩm cấp Tím</option>
-                <option value="blue">🔵 Phẩm cấp Lam</option>
-            </select>
-            <input type="file" id="new-flower-image" accept="image/*" class="w-full text-white text-xs">
-            <button onclick="themHoaMoi()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl cursor-pointer">➕ Thêm Vào Kho Tổng</button>
-        </div>
+        <div id="flower-grid" class="grid grid-cols-3 gap-3"></div>
     </div>
 
     <script>
-    // --- ĐIỀN THÔNG TIN CỦA BẠN VÀO ĐÂY ---
-    const BIN_ID = '6a42a0f6f5f4af5e2942c44f'; 
-    const MASTER_KEY = '$2a$10$xqWM3mrnaAnFrOuWsFgrIufgskPom60ZR.dftWeiE9TX7fnbSUOzS';
-    // --------------------------------------
+        const BIN_ID = '6a42a0f6f5f4af5e2942c44f'; 
+        const MASTER_KEY = '$2a$10$xqWM3mrnaAnFrOuWsFgrIufgskPom60ZR.dftWeiE9TX7fnbSUOzS';
+        let dataTong = { hoa: [], thanhVien: {} };
 
-    let danhSachHoaGoc = [];
-    let duLieuThanhVien = {};
-    let thanhVienHienTai = "";
-    let boLocHienTai = "tat-ca";
+        async function loadData() {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: {'X-Master-Key': MASTER_KEY} });
+            const json = await res.json();
+            dataTong = json.record;
+            renderHoa();
+        }
 
-    // 1. Tải dữ liệu từ JSONbin.io
-    async function taiDuLieuTuCloud() {
-        try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                headers: { 'X-Master-Key': MASTER_KEY }
-            });
-            const data = await res.json();
-            danhSachHoaGoc = data.record.hoa || [];
-            duLieuThanhVien = data.record.thanhVien || {};
-            hienThiHoa(danhSachHoaGoc);
-        } catch (e) { console.error("Lỗi tải dữ liệu:", e); }
-    }
-
-    // 2. Lưu dữ liệu lên JSONbin.io
-    async function luuDuLieuLenCloud() {
-        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-            method: 'PUT',
-            headers: { 
-                'Content-Type': 'application/json',
-                'X-Master-Key': MASTER_KEY 
-            },
-            body: JSON.stringify({ hoa: danhSachHoaGoc, thanhVien: duLieuThanhVien })
-        });
-    }
-
-    // 3. Hàm thêm hoa mới (đã sửa để lưu lên Cloud)
-    async function themHoaMoi() {
-        const ten = document.getElementById('new-flower-name').value;
-        const phamCap = document.getElementById('new-flower-tier').value;
-        const fileInput = document.getElementById('new-flower-image');
-        
-        if (!ten || fileInput.files.length === 0) return alert("Vui lòng nhập tên và chọn ảnh!");
-
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            danhSachHoaGoc.push({ ten, phamCap, anh: e.target.result });
-            await luuDuLieuLenCloud();
-            alert("Đã đồng bộ lên kho tổng!");
-            location.reload();
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-    }
-
-    // 4. Lưu bộ sưu tập (đã sửa để lưu lên Cloud)
-    async function luuBoSuuTapThanhVien() {
-        const name = document.getElementById('username').value.trim();
-        if (!name) return alert("Nhập tên hội viên!");
-        thanhVienHienTai = name;
-        duLieuThanhVien[name] = Array.from(document.querySelectorAll('.flower-checkbox:checked')).map(cb => cb.dataset.name);
-        await luuDuLieuLenCloud();
-        alert("Đã lưu bộ sưu tập cho " + name);
-        hienThiHoa(danhSachHoaGoc);
-    }
-
-    // Các hàm hiển thị (Giữ nguyên logic của bạn)
-    function hienThiHoa(danhSach) {
-        const grid = document.getElementById('flower-grid');
-        grid.innerHTML = '';
-        let hoaDaCo = (thanhVienHienTai && duLieuThanhVien[thanhVienHienTai]) ? duLieuThanhVien[thanhVienHienTai] : [];
-        
-        danhSach.forEach((hoa) => {
-            let classTier = 'tier-purple';
-            let accentColor = 'accent-purple-500';
-            if (hoa.phamCap === 'red') { classTier = 'tier-red'; accentColor = 'accent-red-500'; }
-            else if (hoa.phamCap === 'orange') { classTier = 'tier-orange'; accentColor = 'accent-orange-500'; }
-            else if (hoa.phamCap === 'blue') { classTier = 'tier-blue'; accentColor = 'accent-blue-500'; }
-
-            grid.innerHTML += `
-                <div class="bg-white rounded-2xl p-2 text-center shadow-xs ${classTier} relative group">
-                    <button onclick="xoaHoaTong('${hoa.ten}')" class="absolute top-1 left-1 hidden group-hover:block bg-red-500 text-white text-[9px] px-1 rounded cursor-pointer z-10">Xóa</button>
-                    <input type="checkbox" data-name="${hoa.ten}" ${hoaDaCo.includes(hoa.ten) ? "checked" : ""} class="flower-checkbox absolute top-2 right-2 w-4 h-4 ${accentColor} cursor-pointer">
-                    <img src="${hoa.anh}" class="w-full aspect-square rounded-xl object-cover mb-1.5 bg-gray-100">
-                    <p class="text-[11px] font-black text-gray-700 truncate">${hoa.ten}</p>
+        function renderHoa(tenHienThi = "") {
+            const grid = document.getElementById('flower-grid');
+            const hoaCuaNguoiDangXem = dataTong.thanhVien[tenHienThi] || [];
+            
+            grid.innerHTML = dataTong.hoa.map(h => `
+                <div class="bg-white p-2 rounded-2xl text-center border-2 ${tenHienThi && hoaCuaNguoiDangXem.includes(h.ten) ? 'border-green-500' : 'border-gray-200'}">
+                    <input type="checkbox" class="flower-check" value="${h.ten}" ${hoaCuaNguoiDangXem.includes(h.ten) ? 'checked' : ''}>
+                    <img src="${h.anh}" class="w-full aspect-square object-cover rounded-lg">
+                    <p class="text-[10px] font-bold truncate">${h.ten}</p>
                 </div>
-            `;
-        });
-        capNhatThongSo();
-    }
+            `).join('');
+        }
 
-    async function xoaHoaTong(tenHoa) {
-        if (!confirm("Xác nhận xóa hoa này?")) return;
-        danhSachHoaGoc = danhSachHoaGoc.filter(h => h.ten !== tenHoa);
-        await luuDuLieuLenCloud();
-        location.reload();
-    }
+        function xemBoSuuTapKhac() {
+            const name = document.getElementById('search-name').value;
+            renderHoa(name);
+        }
 
-    function taiBoSuuTapThanhVien() {
-        thanhVienHienTai = document.getElementById('username').value.trim();
-        document.getElementById('view-status').classList.remove('hidden');
-        document.getElementById('view-status').innerText = "Đang xem của: " + thanhVienHienTai;
-        hienThiHoa(danhSachHoaGoc);
-    }
+        async function luuBoSuuTap() {
+            const name = document.getElementById('username').value;
+            if(!name) return alert("Nhập tên!");
+            const checked = Array.from(document.querySelectorAll('.flower-check:checked')).map(c => c.value);
+            
+            dataTong.thanhVien[name] = checked;
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY},
+                body: JSON.stringify(dataTong)
+            });
+            alert("Đã lưu bộ sưu tập lên Cloud!");
+            renderHoa(name);
+        }
 
-    function capNhatThongSo() {
-        document.getElementById('total-flower-types').innerText = danhSachHoaGoc.length;
-        const cácHoiVien = Object.keys(duLieuThanhVien);
-        document.getElementById('total-members').innerText = cácHoiVien.length;
-        document.getElementById('total-flowers').innerText = Object.values(duLieuThanhVien).reduce((a, b) => a + b.length, 0);
-    }
-
-    function locPhamCap(pc) {
-        boLocHienTai = pc;
-        hienThiHoa(pc === 'tat-ca' ? danhSachHoaGoc : danhSachHoaGoc.filter(h => h.phamCap === pc));
-    }
-
-    // Tải dữ liệu khi mở web
-    taiDuLieuTuCloud();
+        loadData();
     </script>
 </body>
 </html>
