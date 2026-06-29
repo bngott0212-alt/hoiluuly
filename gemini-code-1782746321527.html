@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hội Lưu Ly - Quản Lý Hoa</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { background: linear-gradient(180deg, #bfe3f7 0%, #eef7fc 100%); min-height: 100vh; }
+        /* Cấu hình viền và hiệu ứng phát sáng cho 4 phẩm cấp */
+        .tier-red { border: 3px solid #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+        .tier-orange { border: 3px solid #f97316; box-shadow: 0 0 8px rgba(249, 115, 22, 0.4); }
+        .tier-purple { border: 3px solid #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.4); }
+        .tier-blue { border: 3px solid #3b82f6; box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
+    </style>
+</head>
+<body class="font-sans text-gray-800 p-4">
+
+    <div class="text-center my-6">
+        <h1 class="text-3xl font-black text-blue-900 tracking-wide flex justify-center items-center gap-2">
+            🌸 HỘI LƯU LY 🌸
+        </h1>
+        <div class="flex justify-center gap-6 mt-4 bg-white/70 backdrop-blur-md rounded-2xl p-4 max-w-lg mx-auto shadow-sm text-center">
+            <div>
+                <p class="text-[11px] text-gray-500 uppercase font-black">🌸 Tổng Hoa Hội Viên</p>
+                <p class="text-2xl font-black text-blue-950" id="total-flowers">0</p>
+            </div>
+            <div class="border-l border-gray-300"></div>
+            <div>
+                <p class="text-[11px] text-gray-500 uppercase font-black">👥 Hội viên</p>
+                <p class="text-2xl font-black text-blue-950" id="total-members">0</p>
+            </div>
+            <div class="border-l border-gray-300"></div>
+            <div>
+                <p class="text-[11px] text-gray-500 uppercase font-black">📦 Loài trong kho</p>
+                <p class="text-2xl font-black text-blue-950" id="total-flower-types">0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-xl mx-auto bg-white p-5 rounded-2xl shadow-md mb-6 border border-blue-100">
+        <div class="mb-4">
+            <label class="block text-xs font-black text-blue-600 mb-2">👤 NHẬP TÊN THÀNH VIÊN CẦN THÊM HOẶC SỬA HOA:</label>
+            <div class="flex gap-2">
+                <input type="text" id="username" placeholder="Ví dụ: Ngot, Luu Ly Ty Ty..." class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <button onclick="taiBoSuuTapThanhVien()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition cursor-pointer shrink-0 shadow-xs">
+                    🔍 Xem / Tìm
+                </button>
+            </div>
+            
+            <div id="view-status" class="text-xs text-amber-950 bg-amber-50 p-4 rounded-xl border border-amber-200 mt-3 hidden"></div>
+        </div>
+
+        <p class="text-xs font-bold text-gray-500 mb-2">Lọc phẩm cấp hiển thị:</p>
+        <div class="flex flex-wrap gap-2 text-xs">
+            <button onclick="locPhamCap('tat-ca')" class="bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🌈 Tất cả</button>
+            <button onclick="locPhamCap('red')" class="bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🔴 Cấp Đỏ</button>
+            <button onclick="locPhamCap('orange')" class="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🟠 Cấp Cam</button>
+            <button onclick="locPhamCap('purple')" class="bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🟣 Cấp Tím</button>
+            <button onclick="locPhamCap('blue')" class="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full font-medium cursor-pointer">🔵 Cấp Lam</button>
+        </div>
+    </div>
+
+    <div class="max-w-xl mx-auto mb-4"><p class="text-xs font-black text-blue-900">👇 DANH SÁCH HOA TRONG KHO TỔNG (TÍCH CHỌN ĐỂ THÊM HOA):</p></div>
+    <div class="max-w-xl mx-auto grid grid-cols-3 gap-3" id="flower-grid"></div>
+
+    <div class="max-w-xl mx-auto my-6 text-center">
+        <button onclick="luuBoSuuTapThanhVien()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-8 py-4 rounded-xl shadow-md transition w-full max-w-xs cursor-pointer text-sm tracking-wide">
+            💾 Lưu Bộ Sưu Tập Cho Tên Đang Chọn
+        </button>
+    </div>
+
+    <hr class="max-w-xl mx-auto border-gray-300 my-8">
+
+    <div class="max-w-xl mx-auto bg-gradient-to-r from-purple-950 to-slate-900 text-white p-5 rounded-2xl shadow-lg mb-12">
+        <h2 class="text-xs font-black mb-4 tracking-wider text-purple-300">🛠️ BẢNG ADMIN: THÊM LOÀI HOA MỚI VÀO KHO TỔNG</h2>
+        <div class="grid grid-cols-1 gap-3 text-gray-950 text-sm">
+            <div>
+                <label class="block text-xs font-bold text-purple-200 mb-1">Tên hoa mới:</label>
+                <input type="text" id="new-flower-name" placeholder="Ví dụ: Lạp Mai Đỏ..." class="w-full bg-white rounded-xl px-3 py-2 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-purple-200 mb-1">Chọn phẩm cấp (Màu viền):</label>
+                <select id="new-flower-tier" class="w-full bg-white rounded-xl px-3 py-2 focus:outline-none">
+                    <option value="red">🔴 Phẩm cấp Đỏ</option>
+                    <option value="orange">🟠 Phẩm cấp Cam</option>
+                    <option value="purple">🟣 Phẩm cấp Tím</option>
+                    <option value="blue">🔵 Phẩm cấp Lam</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-purple-200 mb-1">Tải ảnh hoa từ thiết bị:</label>
+                <input type="file" id="new-flower-image" accept="image/*" class="w-full bg-white/10 text-white border border-dashed border-white/30 rounded-xl px-3 py-2 cursor-pointer file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-purple-950">
+            </div>
+            <button onclick="themHoaMoi()" class="mt-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl transition shadow cursor-pointer">
+                ➕ Thêm Vào Kho Tổng
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let danhSachHoaGoc = JSON.parse(localStorage.getItem('danhSachHoaLuuLy')) || [];
+        let duLieuThanhVien = JSON.parse(localStorage.getItem('duLieuThanhVienLuuLy')) || {};
+        let thanhVienHienTai = "";
+        let boLocHienTai = "tat-ca";
+
+        function hienThiHoa(danhSach) {
+            const grid = document.getElementById('flower-grid');
+            grid.innerHTML = ''; 
+            
+            let hoaDaCo = [];
+            if (thanhVienHienTai && duLieuThanhVien[thanhVienHienTai]) {
+                hoaDaCo = duLieuThanhVien[thanhVienHienTai];
+            }
+            
+            if (danhSach.length === 0) {
+                grid.innerHTML = `<div class="col-span-3 text-center py-6 text-xs font-bold text-gray-400 bg-white/50 rounded-2xl border border-dashed border-gray-300">Kho tổng chưa có hoa. Hãy kéo xuống bảng Admin để thêm hoa trước!</div>`;
+                capNhatThongSo();
+                return;
+            }
+
+            danhSach.forEach((hoa) => {
+                // Định dạng class viền và màu ô tích cho 4 loại phẩm cấp
+                let classTier = 'tier-purple';
+                let accentColor = 'accent-purple-500';
+                
+                if (hoa.phamCap === 'red') { classTier = 'tier-red'; accentColor = 'accent-red-500'; }
+                else if (hoa.phamCap === 'orange') { classTier = 'tier-orange'; accentColor = 'accent-orange-500'; }
+                else if (hoa.phamCap === 'purple') { classTier = 'tier-purple'; accentColor = 'accent-purple-500'; }
+                else if (hoa.phamCap === 'blue') { classTier = 'tier-blue'; accentColor = 'accent-blue-500'; }
+
+                const daSohuu = hoaDaCo.includes(hoa.ten) ? "checked" : "";
+
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl p-2 text-center shadow-xs ${classTier} relative group">
+                        <button onclick="xoaHoaTong('${hoa.ten}')" class="absolute top-1 left-1 hidden group-hover:block bg-red-500 text-white text-[9px] px-1 py-0.5 rounded cursor-pointer z-10">Xóa loài</button>
+                        <input type="checkbox" data-name="${hoa.ten}" ${daSohuu} class="flower-checkbox absolute top-2 right-2 w-4 h-4 ${accentColor} cursor-pointer">
+                        <img src="${hoa.anh}" class="w-full aspect-square rounded-xl object-cover mb-1.5 bg-gray-100" alt="${hoa.ten}">
+                        <p class="text-[11px] font-black text-gray-700 line-clamp-2 leading-tight">${hoa.ten}</p>
+                    </div>
+                `;
+            });
+            capNhatThongSo();
+        }
+
+        function capNhatThongSo() {
+            document.getElementById('total-flower-types').innerText = danhSachHoaGoc.length;
+            const cácHoiVien = Object.keys(duLieuThanhVien);
+            document.getElementById('total-members').innerText = cácHoiVien.length;
+            
+            let tongHoa = 0;
+            cácHoiVien.forEach(ten => { tongHoa += duLieuThanhVien[ten].length; });
+            document.getElementById('total-flowers
