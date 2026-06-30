@@ -67,81 +67,60 @@
     </div>
 
     <script>
-        let danhSachHoaGoc = JSON.parse(localStorage.getItem('danhSachHoaLuuLy')) || [];
-        let duLieuThanhVien = JSON.parse(localStorage.getItem('duLieuThanhVienLuuLy')) || {};
-        let thanhVienHienTai = "";
-        let boLocHienTai = "tat-ca";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz_qBWQT6IyPWvHUsMh7R0C2znycbOSZ9LyjNpsdPGEmvfrYVghpuhM4wYATRmH4HwH/exec";
+    let danhSachHoaGoc = [];
+    let duLieuThanhVien = JSON.parse(localStorage.getItem('duLieuThanhVienLuuLy')) || {};
+    let thanhVienHienTai = "";
+    let boLocHienTai = "tat-ca";
 
-        function hienThiHoa(danhSach) {
-            const grid = document.getElementById('flower-grid');
-            grid.innerHTML = '';
-            let hoaDaCo = (thanhVienHienTai && duLieuThanhVien[thanhVienHienTai]) ? duLieuThanhVien[thanhVienHienTai] : [];
-            danhSach.forEach(hoa => {
-                let classTier = 'tier-' + (hoa.phamCap || 'purple');
-                let accent = hoa.phamCap === 'red' ? 'accent-red-500' : (hoa.phamCap === 'orange' ? 'accent-orange-500' : (hoa.phamCap === 'blue' ? 'accent-blue-500' : 'accent-purple-500'));
-                grid.innerHTML += `
-                    <div class="bg-white rounded-2xl p-2 text-center shadow-xs ${classTier} relative group">
-                        <button onclick="xoaHoaTong('${hoa.ten}')" class="absolute top-1 left-1 hidden group-hover:block bg-red-500 text-white text-[9px] px-1 rounded cursor-pointer">Xóa</button>
-                        <input type="checkbox" data-name="${hoa.ten}" ${hoaDaCo.includes(hoa.ten) ? "checked" : ""} class="flower-checkbox absolute top-2 right-2 w-4 h-4 ${accent} cursor-pointer">
-                        <img src="${hoa.anh}" class="w-full aspect-square rounded-xl object-cover mb-1.5 bg-gray-100">
-                        <p class="text-[11px] font-black text-gray-700 truncate">${hoa.ten}</p>
-                    </div>
-                `;
-            });
-            capNhatThongSo();
-        }
-
-        function themHoaMoi() {
-            const ten = document.getElementById('new-flower-name').value;
-            const phamCap = document.getElementById('new-flower-tier').value;
-            const fileInput = document.getElementById('new-flower-image');
-            if (!ten || fileInput.files.length === 0) return alert("Nhập tên và chọn ảnh!");
-            const reader = new FileReader();
-            reader.onload = e => {
-                danhSachHoaGoc.push({ten, phamCap, anh: e.target.result});
-                localStorage.setItem('danhSachHoaLuuLy', JSON.stringify(danhSachHoaGoc));
-                alert("Đã thêm!");
-                location.reload();
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-
-        function xoaHoaTong(tenHoa) {
-            danhSachHoaGoc = danhSachHoaGoc.filter(h => h.ten !== tenHoa);
-            localStorage.setItem('danhSachHoaLuuLy', JSON.stringify(danhSachHoaGoc));
-            locPhamCap(boLocHienTai);
-        }
-
-        function luuBoSuuTapThanhVien() {
-            const name = document.getElementById('username').value.trim();
-            if (!name) return alert("Nhập tên!");
-            thanhVienHienTai = name;
-            duLieuThanhVien[name] = Array.from(document.querySelectorAll('.flower-checkbox:checked')).map(cb => cb.dataset.name);
-            localStorage.setItem('duLieuThanhVienLuuLy', JSON.stringify(duLieuThanhVien));
-            alert("Đã lưu!");
-            locPhamCap(boLocHienTai);
-        }
-
-        function taiBoSuuTapThanhVien() {
-            thanhVienHienTai = document.getElementById('username').value.trim();
-            document.getElementById('view-status').classList.remove('hidden');
-            document.getElementById('view-status').innerText = "Đang xem của: " + thanhVienHienTai;
-            locPhamCap(boLocHienTai);
-        }
-
-        function capNhatThongSo() {
-            document.getElementById('total-flower-types').innerText = danhSachHoaGoc.length;
-            const members = Object.keys(duLieuThanhVien);
-            document.getElementById('total-members').innerText = members.length;
-            document.getElementById('total-flowers').innerText = Object.values(duLieuThanhVien).reduce((sum, list) => sum + list.length, 0);
-        }
-
-        function locPhamCap(pc) {
-            boLocHienTai = pc;
-            hienThiHoa(pc === 'tat-ca' ? danhSachHoaGoc : danhSachHoaGoc.filter(h => h.phamCap === pc));
-        }
-
+    // Tải dữ liệu từ Google Sheets
+    async function taiDuLieu() {
+        const response = await fetch(WEB_APP_URL);
+        danhSachHoaGoc = await response.json();
         hienThiHoa(danhSachHoaGoc);
-    </script>
+    }
+
+    function hienThiHoa(danhSach) {
+        const grid = document.getElementById('flower-grid');
+        grid.innerHTML = '';
+        let hoaDaCo = (thanhVienHienTai && duLieuThanhVien[thanhVienHienTai]) ? duLieuThanhVien[thanhVienHienTai] : [];
+        
+        danhSach.forEach(hoa => {
+            let classTier = 'tier-' + (hoa.phamCap || 'purple');
+            grid.innerHTML += `
+                <div class="bg-white rounded-2xl p-2 text-center shadow-xs ${classTier} relative">
+                    <input type="checkbox" data-name="${hoa.ten}" ${hoaDaCo.includes(hoa.ten) ? "checked" : ""} class="flower-checkbox absolute top-2 right-2 cursor-pointer">
+                    <img src="${hoa.anh}" class="w-full aspect-square rounded-xl object-cover mb-1.5">
+                    <p class="text-[11px] font-black text-gray-700 truncate">${hoa.ten}</p>
+                </div>
+            `;
+        });
+        capNhatThongSo();
+    }
+
+    // Thêm hoa mới lên Google Sheets
+    async function themHoaMoi() {
+        const ten = document.getElementById('new-flower-name').value;
+        const phamCap = document.getElementById('new-flower-tier').value;
+        const file = document.getElementById('new-flower-image').files[0];
+        if (!ten || !file) return alert("Nhập tên và chọn ảnh!");
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const payload = { ten, phamCap, anh: e.target.result };
+            await fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            alert("Đã thêm vào kho tổng!");
+            location.reload();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ... (Giữ nguyên các hàm luuBoSuuTapThanhVien, taiBoSuuTapThanhVien như cũ)
+
+    taiDuLieu(); // Gọi khi load trang
+</script>
 </body>
 </html>
